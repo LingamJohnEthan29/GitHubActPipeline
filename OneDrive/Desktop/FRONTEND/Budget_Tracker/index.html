@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+</head>
+<body>
+    <h1>Track your budget!</h1>
+    <div class="formdiv">
+        <form onsubmit="createFields(event)">
+            <label for="numfields">Enter the number of categories you want to track in:</label>
+            <input type="number" id="numFields" min="2"/>
+            <button type="submit">Create</button> 
+            <div id="inputContainer" style="margin-top: 20px;"></div>
+        </form>
+    </div>
+    <button onclick="plot()">Submit</button>
+    <div class="chartdiv">
+        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+    </div>
+</body>
+<script>
+    function getRandomColor(){
+        const letters = '0123456789ABCDEF';
+        let  color = '#';
+        for(let i =0; i<6; i++){
+            color += letters[Math.floor(Math.random()*16)];
+        }
+        return color;
+    }
+
+    function createFields(event){
+        event.preventDefault(); // prevent form refresh
+        const container = document.getElementById("inputContainer");
+        container.innerHTML = "";
+        const n = parseInt(document.getElementById("numFields").value);
+        for(let i=0;i<n;i++){
+            // Label for Expense Name
+            const namelabel = document.createElement("label");
+            namelabel.innerText = `Expense Name ${i+1}:`;
+            const nameInput = document.createElement("input");
+            nameInput.type = "text";
+            nameInput.id =`expenseName${i}`;  
+
+            //Label for Expense Value
+            const valueLabel = document.createElement("label");
+            valueLabel.innerText = `Value:`;
+            const valueInput = document.createElement("input");
+            valueInput.type = "number";
+            valueInput.id = `expenseValue${i}`;
+
+            container.appendChild(namelabel);
+            container.appendChild(nameInput);
+            container.appendChild(valueLabel);
+            container.appendChild(valueInput);
+            container.appendChild(document.createElement("br"));
+        }
+    }
+
+    function plot(){
+        const n = parseInt(document.getElementById("numFields").value);
+        const expenseNames = [];
+        const expenseValues= [];
+        const colors = [];
+        for (let i = 0; i < n; i++) {
+            const name = document.getElementById(`expenseName${i}`).value;
+            const value = parseFloat(document.getElementById(`expenseValue${i}`).value);
+
+            expenseNames.push(name);
+            expenseValues.push(value);
+        }
+        for(let i=0;i<n;i++){
+            const color = getRandomColor();
+            colors.push(color);
+        }
+
+        new Chart("myChart", {
+            type: "pie",
+            data: {
+                labels: expenseNames,
+                datasets: [{
+                    backgroundColor: colors,
+                    data: expenseValues
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Your budget report"
+                }
+            }
+        });
+    }
+</script>
+</html>
